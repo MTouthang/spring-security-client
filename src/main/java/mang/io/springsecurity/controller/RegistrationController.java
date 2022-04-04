@@ -1,12 +1,16 @@
 package mang.io.springsecurity.controller;
 
 import mang.io.springsecurity.entity.User;
+import mang.io.springsecurity.event.RegistrationCompleteEvent;
 import mang.io.springsecurity.model.UserModel;
 import mang.io.springsecurity.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 public class RegistrationController {
@@ -14,9 +18,24 @@ public class RegistrationController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private ApplicationEventPublisher publisher;
+
     @PostMapping("/register")
-    public String registerUser(@RequestBody UserModel userModel){
+    public String registerUser(@RequestBody UserModel userModel, final HttpServletRequest request){
         User user = userService.registerUser(userModel);
+        publisher.publishEvent(new RegistrationCompleteEvent(
+                user,
+                applicationUrl(request)
+        ));
         return "success";
+    }
+    private String applicationUrl(HttpServletRequest request){
+        return "http://" +
+                request.getServerName() +
+                ": " +
+                request.getServerPort() +
+                request.getContextPath();
+
     }
 }
