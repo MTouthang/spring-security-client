@@ -6,9 +6,11 @@ import mang.io.springsecurity.event.RegistrationCompleteEvent;
 import mang.io.springsecurity.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+@Component
 @Slf4j
 public class RegistrationCompleteEventListener implements
         ApplicationListener<RegistrationCompleteEvent> {
@@ -24,7 +26,7 @@ public class RegistrationCompleteEventListener implements
         userService.saveVerificationTokenForUser(token, user);
 
         // send Mail to User sendVerification email
-        String url = event.getApplicationUrl() + "verifyRegistration?token=" + token;
+        String url = event.getApplicationUrl() + "/verifyRegistration?token=" + token;
         log.info("Click the link to verify your account: {}", url);
     }
 }
